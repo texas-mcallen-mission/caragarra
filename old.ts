@@ -36,11 +36,7 @@ const fbConstants = {
     fetchArgs: { "muteHttpExceptions": true }
 };
 
-function convertDateToFBCompatString_(date) {
-    let inDate = new Date(date);
-    let outString = inDate.getDay() + " " + monthsOfYear.short[inDate.getMonth()] + " " + inDate.getFullYear();
-    return outString;
-}
+
 
 function getPageIDs(userToken) {
     function pageManagerFetcher() {
