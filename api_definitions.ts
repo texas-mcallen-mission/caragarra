@@ -151,6 +151,9 @@ interface targeting_object_struct {
     // AND MANY MORE!!!
 }
 
+enum post_object_keys {
+    
+}
 interface feed_targeting_struct { // I have no idea what this looks like IRL yet...
     country: any,
     cities: any,
