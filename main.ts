@@ -86,7 +86,21 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     return responseData;
 }
 
+class post {
+    access_token: string
+    post_id:string
+    
+    constructor(post_id,access_token) {
+        this.post_id = post_id
+        this.access_token = access_token
+    }
 
+    getPostStats() {
+        let request = this.post_id + "lds=likes.summary(true),comments.summary(true),shares.summary(true)"
+        // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
+    }
+
+}
 
 class user {
     access_token: string;
@@ -132,6 +146,8 @@ class user {
 function testerThingy() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
     let managedPages = self.getManagedPages()
+    let lcsData = []
+
     for (let pageInfo of managedPages) {
         console.log(pageInfo)
 
