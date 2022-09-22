@@ -41,6 +41,7 @@ function mergeCustomizer(objValue, srcValue) {
         // console.log(srcValue)
         let out_obj = [...objValue, ...srcValue];
         return out_obj;
+    }
 }
 
 function testMergeCustomizer() {
