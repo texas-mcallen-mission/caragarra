@@ -1,4 +1,9 @@
+// Step 0: Import lodash, because it's super-duper useful
+//@ts-expect-error using external libraries is a little weird because it's not a classically-defined package...
+var _ = lodash.load();
+
 // Step 1: Define the FB stuff we're going to use
+
 
 const fbConfigOptions = {
     baseURL: 'https://graph.facebook.com/v15.0/',
@@ -24,14 +29,52 @@ interface postArgs {
     limit?: number,
 }
 
-function fbFetcher(request: string, access_token:string): {} {
+function mergeCustomizer(objValue, srcValue) {
+    if (_.isArray(objValue)) {
+        return objValue.concat(srcValue)
+    }
+}
+
+function testMergeCustomizer() {
+    let obj1 = {
+        key1: "WORDS",
+        key2: "Key2",
+        key3: { key3_1: "worrrd" },
+        array1: ["CHICKEN NUGGET","TESTBUCKET"]
+    }
+    let obj2 = {
+        key2: "replacement",
+        key3: { key3_2: "additionalStuff" },
+        array1: ["WHOOPDY","TEST"]
+    }
+    let expectedResult = {
+        key1: "WORDS",
+        key2: "replacement",
+        key3: { key3_1: "worrrd", key3_2: "additionalStuff" },
+        array1: ["CHICKEN NUGGET", "TESTBUCKET", "WHOOPDY", "TEST"]
+    }
+
+    console.log(_.merge(obj1, obj2))
+    console.log(_.mergeWith(obj1,obj2,mergeCustomizer))
+
+}
+
+function fbFetcher(request: string, access_token:string,includePages:boolean = true): {} {
     let appendCharacter = "?"
     if (request.includes("?")) {
         appendCharacter = "&"
     }
     let url: string = fbConfigOptions.baseURL + request + appendCharacter + fbConfigOptions.access_token_tag + access_token
     var response = UrlFetchApp.fetch(url, fbConstants.fetchArgs)
-    return JSON.parse(response.getContentText())
+    let responseData: {} = JSON.parse(response.getContentText())
+    
+    if (includePages && responseData.hasOwnProperty("next")) {
+        let recurseData = fbFetcher(responseData["next"], access_token, true)
+        let intermediateOutput = _.mergeWith(responseData, recurseData, mergeCustomizer)
+        return intermediateOutput
+    }
+
+    return responseData;
 }
 
 class fbPage {
