@@ -31,8 +31,16 @@ interface postArgs {
 
 function mergeCustomizer(objValue, srcValue) {
     if (_.isArray(objValue)) {
-        return objValue.concat(srcValue)
-    }
+        // console.log("key:",key)
+        // console.log("object:",object)
+        // console.log("source:",source)
+        // console.log("stack:",stack)
+        // console.log("objValue:",objValue)
+        // console.log("srcValue",srcValue)
+        // console.log(objValue)
+        // console.log(srcValue)
+        let out_obj = [...objValue, ...srcValue];
+        return out_obj;
 }
 
 function testMergeCustomizer() {
