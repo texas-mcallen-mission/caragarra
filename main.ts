@@ -86,30 +86,7 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     return responseData;
 }
 
-interface category_list_struct {
-    id: string,
-    name: string,
-}
 
-enum task_options {
-    "ANALYZE" = "ANALYZE",
-    "ADVERTISE" = "ADVERTISE",
-    "MESSAGING" = "MESSAGING",
-    "MODERATE" = "MODERATE",
-    "CREATE_CONTENT" = "CREATE_CONTENT",
-    "MANAGE" = "MANAGE"
-
-}
-
-interface pageManagementData_struct {
-    access_token: string,
-    category: string,
-    category_list: category_list_struct[];
-    name: string,
-    id: string,
-    tasks: task_options[],
-    used_token?: string,
-}
 
 class user {
     access_token: string;
@@ -129,12 +106,12 @@ class user {
             }
         }
     }
-    getManagedPages() {
+    getManagedPages():pageManagementData_struct[] {
         let request = "me/accounts?type=page";
         //@ts-ignore function is too generalized atm to do this, but it's useful still...
         let response = fbFetcher_(request, this.access_token);
         if (!response.hasOwnProperty("data")) {
-            return;
+            return []
         }
         let responseData: pageManagementData_struct[] = response["data"];
         let pages: pageManagementData_struct[] = [];
@@ -142,9 +119,11 @@ class user {
 
         for (let entry of responseData) {
             let request = entry.id + "?fields=access_token";
-            entry.used_token = entry.access_token;
-            entry.access_token = fbFetcher_(request, this.access_token)["access_token"];
+            // entry.used_token = entry.access_token;
+            entry.page_access_token = fbFetcher_(request, this.access_token)["access_token"];
+            pages.push(entry)
         }
+        return pages
 
 
     }
@@ -152,7 +131,15 @@ class user {
 
 function testerThingy() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
+    let managedPages = self.getManagedPages()
+    for (let pageInfo of managedPages) {
+        console.log(pageInfo)
 
+            // former ts-ignore for some reason it's mad at page_access_token, even though it might not exist... wait, I can make it not optional, lol
+            let pageObj = new fbPage(pageInfo.page_access_token,pageInfo.id,fbConfigOptions)
+            console.log(pageObj.getAllPostList())
+        
+    }
 }
 
 

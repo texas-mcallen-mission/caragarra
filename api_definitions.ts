@@ -1,3 +1,31 @@
+/* INTERNAL DEFINITIONS */
+interface category_list_struct {
+    id: string,
+    name: string,
+}
+
+enum task_options {
+    "ANALYZE" = "ANALYZE",
+    "ADVERTISE" = "ADVERTISE",
+    "MESSAGING" = "MESSAGING",
+    "MODERATE" = "MODERATE",
+    "CREATE_CONTENT" = "CREATE_CONTENT",
+    "MANAGE" = "MANAGE"
+
+}
+
+interface pageManagementData_struct {
+    access_token: string,
+    category: string,
+    category_list: category_list_struct[];
+    name: string,
+    id: string,
+    tasks: task_options[],
+    page_access_token: string,
+}
+
+
+
 /* INTERFACE DEFINITIONS */
 
 interface dynamic_posts_struct {
@@ -152,7 +180,7 @@ interface targeting_object_struct {
 }
 
 enum post_object_keys {
-    
+
 }
 interface feed_targeting_struct { // I have no idea what this looks like IRL yet...
     country: any,
