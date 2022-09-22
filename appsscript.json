@@ -3,7 +3,7 @@
     "dependencies": {
         "libraries": [
             {
-                "userSymbol": "Lodash",
+                "userSymbol": "lodash",
                 "version": "1",
                 "libraryId": "1cMT3fBZ9Ak0e6LMQRMtCJEJfDSKx0xpq6l-tJ9gy6jbrHzrUpyyt1JDc",
                 "developmentMode": false
