@@ -16,7 +16,7 @@ interface post_struct_extra_stats extends post_struct {
     message: string, // default if no fields are requested
     likes: like_data_extra_stats,
     comments: comment_data_extra_stats,
-    shares: share_data,
+    shares?: share_data,
     is_popular:boolean,
 }
 

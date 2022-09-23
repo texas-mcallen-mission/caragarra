@@ -218,13 +218,14 @@ class post {
     }
 
     getPostStats():post_struct_extra_stats|null {
-        let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true),is_popular,created_time"
+        let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true),is_popular,created_time,message"
         // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
-        let inData = fbFetcher_(request, this.access_token)
+        let inData: post_struct_extra_stats | {} = fbFetcher_(request, this.access_token)
         console.log(inData)
-        if (inData.hasOwnProperty("data")) {
-            let requestData: post_struct_extra_stats = inData["data"]
-            return requestData
+        if (inData.hasOwnProperty("likes")) {
+            // let requestData: post_struct_extra_stats = inData["data"]
+            //@ts-ignore yeah, not quite smart enough to not mute this thing yet.  TODO FIX
+            return inData
 
         } else {
             return null
@@ -263,7 +264,14 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
     };
     outData.likes = post_data.likes.summary.total_count;
     outData.comments = post_data.comments.summary.total_count;
-    outData.shares = post_data.shares.count;
+    if (post_data.hasOwnProperty("shares")) {
+        //@ts-expect-error stupid linter doesn't know I'm LITERALLY CHECKING FOR THAT ERROR
+        if (post_data["shares"].hasOwnProperty("count")) {
+            //@ts-expect-error same as above, I'm literally checking for that RIGHT HERE 
+            outData.shares = post_data["shares"]["count"]
+        }
+        
+    }
     outData.message = post_data.message;
     outData.created_time = post_data.created_time
     outData.is_popular = post_data.is_popular
