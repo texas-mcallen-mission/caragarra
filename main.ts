@@ -237,19 +237,26 @@ class post {
 // interface post_parsedData {
     
 // }
+
+interface parsed_post_data {
+    likes: number,
+    comments: number,
+    shares: number,
+    message: string,
+    created_time: string,
+    is_popular:boolean
+}
 /**
  *  Takes in a fully stat-filled post data structure and returns a nice & flat entry usable with kiData.
  *
  * @param {post_struct_extra_stats} post_data
  */
-function parsePostStats(post_data: post_struct_extra_stats) {
+function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
     // let outData = {}
     let outData = {
         likes: 0,
         comments: 0,
         shares: 0,
-        // pageID: this.pageID,
-        // pageName: this.pageName
         message: "",
         created_time: "",
         is_popular:false
@@ -260,6 +267,8 @@ function parsePostStats(post_data: post_struct_extra_stats) {
     outData.message = post_data.message;
     outData.created_time = post_data.created_time
     outData.is_popular = post_data.is_popular
+
+    return outData
 }
 
 function testerThingy() {
@@ -270,14 +279,17 @@ function testerThingy() {
     let managedPages:fbPage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
         let pagePosts: post[] = page.getAllPostObjs()
+        let page_post_ki_data:parsed_post_data[] = []
         for (let pagePost of pagePosts) {
             let postData = pagePost.getPostStats()
             if (postData) {
                 let post_stats = parsePostStats(postData);
+                page_post_ki_data.push(post_stats)
             }
 
         }
-        
+        console.info(page.getPageName(),"stats:")
+        console.log(page_post_ki_data)
     }
 }
 
