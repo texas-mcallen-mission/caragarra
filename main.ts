@@ -120,7 +120,7 @@ class user {
             }
         }
     }
-    getManagedPages():pageManagementData_struct[] {
+    getManagedPageData():pageManagementData_struct[] {
         let request = "me/accounts?type=page";
         //@ts-ignore function is too generalized atm to do this, but it's useful still...
         let response = fbFetcher_(request, this.access_token);
@@ -141,19 +141,31 @@ class user {
 
 
     }
+
+    getManagedPageObjs(): fbPage[]{
+        let pages:fbPage[] = []
+        
+        let managedPages:pageManagementData_struct[] = this.getManagedPageData()
+
+        for (let pageInfo of managedPages) {
+            let pageObj = new fbPage(pageInfo.page_access_token, pageInfo.id, this.config)
+            pages.push(pageObj)
+        }
+
+        return pages
+    }
 }
+
 
 function testerThingy() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
-    let managedPages = self.getManagedPages()
+    // let managedPages = self.getManagedPageData()
     let lcsData = []
 
-    for (let pageInfo of managedPages) {
-        console.log(pageInfo)
-
-            // former ts-ignore for some reason it's mad at page_access_token, even though it might not exist... wait, I can make it not optional, lol
-            let pageObj = new fbPage(pageInfo.page_access_token,pageInfo.id,fbConfigOptions)
-            console.log(pageObj.getAllPostList())
+    let managedPages = self.getManagedPageObjs()
+    for (let page of managedPages) {
+        console.log(page.page_id)
+        console.log(page.getAllPostList())
         
     }
 }
