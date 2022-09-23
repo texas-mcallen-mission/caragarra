@@ -1,4 +1,36 @@
 /* INTERNAL DEFINITIONS */
+
+interface like_data {
+    data: any[],
+    summary?: { // to get this, request like.summary(true)
+        total_count: number,
+        can_like: boolean,
+        has_liked: boolean;
+    };
+}
+
+
+interface comment_data {
+    data: any[],
+    summary?: { // to get this, request comment.summary(true)
+        total_count: number,
+        can_comment: boolean,
+    };
+}
+
+interface share_data {
+    count: number;
+}
+
+
+interface post_struct {
+    id: string, // default, always present
+    created_time?: string, // default if no fields are requested
+    message?: string, // default if no fields are requested
+    likes?: like_data,
+    comments?: comment_data,
+    shares?: share_data,
+}
 interface category_list_struct {
     id: string,
     name: string,

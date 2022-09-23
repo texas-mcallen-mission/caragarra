@@ -86,22 +86,6 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     return responseData;
 }
 
-class post {
-    access_token: string
-    post_id:string
-    
-    constructor(post_id,access_token) {
-        this.post_id = post_id
-        this.access_token = access_token
-    }
-
-    getPostStats() {
-        let request = this.post_id + "lds=likes.summary(true),comments.summary(true),shares.summary(true)"
-        // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
-    }
-
-}
-
 class user {
     access_token: string;
     user_id: string;
@@ -120,12 +104,12 @@ class user {
             }
         }
     }
-    getManagedPageData():pageManagementData_struct[] {
+    getManagedPageData(): pageManagementData_struct[] {
         let request = "me/accounts?type=page";
         //@ts-ignore function is too generalized atm to do this, but it's useful still...
         let response = fbFetcher_(request, this.access_token);
         if (!response.hasOwnProperty("data")) {
-            return []
+            return [];
         }
         let responseData: pageManagementData_struct[] = response["data"];
         let pages: pageManagementData_struct[] = [];
@@ -135,41 +119,26 @@ class user {
             let request = entry.id + "?fields=access_token";
             // entry.used_token = entry.access_token;
             entry.page_access_token = fbFetcher_(request, this.access_token)["access_token"];
-            pages.push(entry)
+            pages.push(entry);
         }
-        return pages
+        return pages;
 
 
     }
 
-    getManagedPageObjs(): fbPage[]{
-        let pages:fbPage[] = []
-        
-        let managedPages:pageManagementData_struct[] = this.getManagedPageData()
+    getManagedPageObjs(): fbPage[] {
+        let pages: fbPage[] = [];
+
+        let managedPages: pageManagementData_struct[] = this.getManagedPageData();
 
         for (let pageInfo of managedPages) {
-            let pageObj = new fbPage(pageInfo.page_access_token, pageInfo.id, this.config)
-            pages.push(pageObj)
+            let pageObj = new fbPage(pageInfo.page_access_token, pageInfo.id, this.config);
+            pages.push(pageObj);
         }
 
-        return pages
+        return pages;
     }
 }
-
-
-function testerThingy() {
-    let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
-    // let managedPages = self.getManagedPageData()
-    let lcsData = []
-
-    let managedPages = self.getManagedPageObjs()
-    for (let page of managedPages) {
-        console.log(page.page_id)
-        console.log(page.getAllPostList())
-        
-    }
-}
-
 
 class fbPage {
     access_token: string;
@@ -209,6 +178,58 @@ class fbPage {
 
         }
     }
+    getAllPagePostData() {
+        let request = this.page_id + "/posts?fields=created_time,message,likes.summary(true),comments.summary(true),shares.summary(true),insights"
+        let data = fbFetcher_(request, this.access_token)
+    // basically there's a way to get multiple thingies at once at a wayyyyy cheaper I/O cost.  I'll have to figure this out eventually, first I need to figure out what all I need from it one-by-one
+    // the above note matters more for a getAllPagePost_KIData or similar method that formats everything for me. 
+    }
+    getAllPostObjs() {
+        let data = this.getAllPostList()
 
+    }
 
 }
+
+
+
+class post {
+    access_token: string
+    post_id:string
+    
+    constructor(post_id,access_token) {
+        this.post_id = post_id
+        this.access_token = access_token
+    }
+
+    getPostStats() {
+        let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true)"
+        // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
+        let inData = fbFetcher_(request, this.access_token)
+        console.log(inData)
+        if (inData.hasOwnProperty("data")) {
+            let requestData: post_struct = inData["data"]
+            return request
+
+        } else {
+            return {}
+        }
+
+    }
+
+}
+
+
+function testerThingy() {
+    let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
+    // let managedPages = self.getManagedPageData()
+    let lcsData = []
+
+    let managedPages = self.getManagedPageObjs()
+    for (let page of managedPages) {
+        console.log(page.page_id)
+        console.log(page.getAllPostList())
+        
+    }
+}
+
