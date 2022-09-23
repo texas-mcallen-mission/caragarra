@@ -298,6 +298,17 @@ function testerThingy() {
         }
         console.info(page.getPageName(),"stats:")
         console.log(page_post_ki_data)
+        /* WYLO: Getting ready for integrating everything.
+            Need to figure out the batching options so that I can get multiple posts's data from the same page at once
+            - now that there's a standardized output, it shouldn't be that hard to do properly
+            - might as well use the kiDataClass to do stuff like add bulk keypairs and the like
+
+            Once kiData is working, it's time to add sheetDataClass into the mix- I want to be able to manually log stuff over time at any particular interval
+            - also good time to find the limits of how many requests I can make
+
+            After that it's onto live tests, methinks.
+
+        */
     }
 }
 
