@@ -194,9 +194,18 @@ class fbPage {
 
         return posts
     }
+    getPageName(): string {
+        let request = this.page_id + "?fields=name"
+        
+        let data = fbFetcher_(request, this.access_token)
+        if (data.hasOwnProperty("name")) {
+            return data["name"];
+        } else {
+            return ""
+        }
+    }
 
 }
-
 
 
 class post {
@@ -208,23 +217,50 @@ class post {
         this.access_token = access_token
     }
 
-    getPostStats() {
-        let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true)"
+    getPostStats():post_struct_extra_stats|null {
+        let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true),is_popular,created_time"
         // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
         let inData = fbFetcher_(request, this.access_token)
         console.log(inData)
         if (inData.hasOwnProperty("data")) {
-            let requestData: post_struct = inData["data"]
-            return request
+            let requestData: post_struct_extra_stats = inData["data"]
+            return requestData
 
         } else {
-            return {}
+            return null
         }
 
     }
 
 }
 
+// interface post_parsedData {
+    
+// }
+/**
+ *  Takes in a fully stat-filled post data structure and returns a nice & flat entry usable with kiData.
+ *
+ * @param {post_struct_extra_stats} post_data
+ */
+function parsePostStats(post_data: post_struct_extra_stats) {
+    // let outData = {}
+    let outData = {
+        likes: 0,
+        comments: 0,
+        shares: 0,
+        // pageID: this.pageID,
+        // pageName: this.pageName
+        message: "",
+        created_time: "",
+        is_popular:false
+    };
+    outData.likes = post_data.likes.summary.total_count;
+    outData.comments = post_data.comments.summary.total_count;
+    outData.shares = post_data.shares.count;
+    outData.message = post_data.message;
+    outData.created_time = post_data.created_time
+    outData.is_popular = post_data.is_popular
+}
 
 function testerThingy() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
@@ -233,9 +269,13 @@ function testerThingy() {
 
     let managedPages:fbPage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
-        let pagePosts:post[] = page.getAllPostObjs()
+        let pagePosts: post[] = page.getAllPostObjs()
         for (let pagePost of pagePosts) {
-            console.log(pagePost.getPostStats())
+            let postData = pagePost.getPostStats()
+            if (postData) {
+                let post_stats = parsePostStats(postData);
+            }
+
         }
         
     }

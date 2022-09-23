@@ -9,6 +9,31 @@ interface like_data {
     };
 }
 
+// this is essentially a more explicit declaration so that I can guarantee that stat numbers will be there.
+
+interface post_struct_extra_stats extends post_struct {
+    created_time: string, // default if no fields are requested
+    message: string, // default if no fields are requested
+    likes: like_data_extra_stats,
+    comments: comment_data_extra_stats,
+    shares: share_data,
+    is_popular:boolean,
+}
+
+interface like_data_extra_stats extends like_data {
+    summary: { 
+        total_count: number,
+        can_like: boolean,
+        has_liked: boolean;
+    };
+}
+
+interface comment_data_extra_stats extends comment_data {
+    summary: {
+        total_count: number,
+        can_comment: boolean
+    }
+}
 
 interface comment_data {
     data: any[],
@@ -30,6 +55,7 @@ interface post_struct {
     likes?: like_data,
     comments?: comment_data,
     shares?: share_data,
+    is_popular?: boolean,
 }
 interface category_list_struct {
     id: string,
