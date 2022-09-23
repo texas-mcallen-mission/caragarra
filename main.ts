@@ -231,7 +231,7 @@ function testerThingy() {
     // let managedPages = self.getManagedPageData()
     let lcsData = []
 
-    let managedPages:fbpage[] = self.getManagedPageObjs()
+    let managedPages:fbPage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
         let pagePosts:post[] = page.getAllPostObjs()
         for (let pagePost of pagePosts) {
