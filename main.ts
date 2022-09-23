@@ -151,7 +151,7 @@ class fbPage {
         this.config = fbConfigOptions;
     }
 
-    getAllPostList(): any[] {
+    getAllPostList(): post_struct[] {
         let request = this.page_id + "/posts";
         let response = fbFetcher_(request, this.access_token);
 
@@ -184,9 +184,15 @@ class fbPage {
     // basically there's a way to get multiple thingies at once at a wayyyyy cheaper I/O cost.  I'll have to figure this out eventually, first I need to figure out what all I need from it one-by-one
     // the above note matters more for a getAllPagePost_KIData or similar method that formats everything for me. 
     }
-    getAllPostObjs() {
-        let data = this.getAllPostList()
+    getAllPostObjs():post[] {
+        let inData:post_struct[] = this.getAllPostList()
+        let posts:post[] = []
+        for (let postEntry of inData) {
+            let postObj = new post(postEntry.id, this.access_token)
+            posts.push(postObj)
+        }
 
+        return posts
     }
 
 }
@@ -225,10 +231,12 @@ function testerThingy() {
     // let managedPages = self.getManagedPageData()
     let lcsData = []
 
-    let managedPages = self.getManagedPageObjs()
+    let managedPages:fbpage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
-        console.log(page.page_id)
-        console.log(page.getAllPostList())
+        let pagePosts:post[] = page.getAllPostObjs()
+        for (let pagePost of pagePosts) {
+            console.log(pagePost.getPostStats())
+        }
         
     }
 }
