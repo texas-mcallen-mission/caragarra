@@ -2,7 +2,16 @@
 //@ts-expect-error using external libraries is a little weird because it's not a classically-defined package...
 var _ = lodash.load();
 
+// Next: set up config for sheetCore to make it happy too:
+const sheetCoreConfig: sheetCoreConfigInfo = {
+    cacheKey: "SHEETCORe",
+    cacheExpiration: 1800,
+    cacheEnabled: true,
+
+
+};
 // Step 1: Define the FB stuff we're going to use
+
 
 
 const fbConfigOptions = {
@@ -31,14 +40,6 @@ interface postArgs {
 
 function mergeCustomizer_(objValue, srcValue) {
     if (_.isArray(objValue)) {
-        // console.log("key:",key)
-        // console.log("object:",object)
-        // console.log("source:",source)
-        // console.log("stack:",stack)
-        // console.log("objValue:",objValue)
-        // console.log("srcValue",srcValue)
-        // console.log(objValue)
-        // console.log(srcValue)
         let out_obj = [...objValue, ...srcValue];
         return out_obj;
     }
@@ -63,8 +64,8 @@ function testMergeCustomizer() {
         array1: ["CHICKEN NUGGET", "TESTBUCKET", "WHOOPDY", "TEST"]
     };
 
-    console.log(_.merge(obj1, obj2));
-    console.log(_.mergeWith(obj1, obj2, mergeCustomizer_));
+    // console.log(_.merge(obj1, obj2));
+    // console.log(_.mergeWith(obj1, obj2, mergeCustomizer_));
 
 }
 
@@ -221,7 +222,7 @@ class post {
         let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true),is_popular,created_time,message"
         // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
         let inData: post_struct_extra_stats | {} = fbFetcher_(request, this.access_token)
-        console.log(inData)
+        // console.log(inData)
         if (inData.hasOwnProperty("likes")) {
             // let requestData: post_struct_extra_stats = inData["data"]
             //@ts-ignore yeah, not quite smart enough to not mute this thing yet.  TODO FIX
@@ -235,9 +236,6 @@ class post {
 
 }
 
-// interface post_parsedData {
-    
-// }
 
 interface parsed_post_data {
     likes: number,
@@ -282,7 +280,7 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
 function testerThingy() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
     // let managedPages = self.getManagedPageData()
-    let lcsData = []
+    let lcsData:kiDataEntry[] = []
 
     let managedPages:fbPage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
@@ -297,7 +295,14 @@ function testerThingy() {
 
         }
         console.info(page.getPageName(),"stats:")
-        console.log(page_post_ki_data)
+        // console.log(page_post_ki_data)
+        let fbStatsClass = new kiDataClass(page_post_ki_data)
+        let additionalData = {
+            page_id: page.page_id,
+            page_name: page.getPageName(),
+        }
+        let addedData = fbStatsClass.bulkAppendObject(additionalData).end
+        lcsData.push(...addedData)
         /* WYLO: Getting ready for integrating everything.
             Need to figure out the batching options so that I can get multiple posts's data from the same page at once
             - now that there's a standardized output, it shouldn't be that hard to do properly
@@ -310,5 +315,18 @@ function testerThingy() {
 
         */
     }
+    let testDataConfig: sheetDataEntry = {
+        tabName: "fbDataDemo",
+        headerRow: 0,
+        initialColumnOrder: {
+            page_id:0
+        },
+        includeSoftcodedColumns: true,
+    }
+    let testSheetRaw = new RawSheetData(testDataConfig)
+    let testSheet = new SheetData(testSheetRaw)
+    testSheet.setData(lcsData)
+    console.log("completed.")
+
 }
 
