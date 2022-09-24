@@ -278,9 +278,32 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
 }
 
 function testerThingy() {
+    // setup for sheetdata classs
+    let testDataConfig: sheetDataEntry = {
+        tabName: "fbDataDemo",
+        headerRow: 0,
+        initialColumnOrder: {
+            page_id: 0,
+            page_name: 1,
+            message: 2,
+            likes: 3,
+            comments: 4,
+            shares: 5,
+            is_popular: 6,
+            created_time: 7,
+            compat_time: 8,
+        },
+        includeSoftcodedColumns: true,
+    };
+    
+    // let testSheetRaw = 
+        let testSheet = new SheetData(new RawSheetData(testDataConfig);)
+    
+    // now onto the FB-specific stuff.
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
     // let managedPages = self.getManagedPageData()
     let lcsData:kiDataEntry[] = []
+
 
     let managedPages:fbPage[] = self.getManagedPageObjs()
     for (let page of managedPages) {
@@ -301,7 +324,9 @@ function testerThingy() {
             page_id: page.page_id,
             page_name: page.getPageName(),
         }
-        let addedData = fbStatsClass.bulkAppendObject(additionalData).end
+        fbStatsClass.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
+
+        let addedData = fbStatsClass.end
         lcsData.push(...addedData)
         /* WYLO: Getting ready for integrating everything.
             Need to figure out the batching options so that I can get multiple posts's data from the same page at once
@@ -315,16 +340,7 @@ function testerThingy() {
 
         */
     }
-    let testDataConfig: sheetDataEntry = {
-        tabName: "fbDataDemo",
-        headerRow: 0,
-        initialColumnOrder: {
-            page_id:0
-        },
-        includeSoftcodedColumns: true,
-    }
-    let testSheetRaw = new RawSheetData(testDataConfig)
-    let testSheet = new SheetData(testSheetRaw)
+
     testSheet.setData(lcsData)
     console.log("completed.")
 
