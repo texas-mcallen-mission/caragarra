@@ -182,10 +182,15 @@ class fbPage {
     getAllPagePostData() {
         let request = this.page_id + "/posts?fields=created_time,message,likes.summary(true),comments.summary(true),shares.summary(true),insights"
         let data = fbFetcher_(request, this.access_token)
-
-        console.log(data)
+        let outData: post_struct_extra_stats[] = []
+        if (data.hasOwnProperty("data")) {
+            outData = data["data"]
+        }
+        console.log(outData)
         // I *THINK* data here should be of type post_struct_extra_stats[]
-        console.log(data[0].getKeys())
+        console.log(Object.getOwnPropertyNames(outData[0]))
+
+        // WYLO: making sure everything is in the post_struct_extra_stats format.
     // basically there's a way to get multiple thingies at once at a wayyyyy cheaper I/O cost.  I'll have to figure this out eventually, first I need to figure out what all I need from it one-by-one
     // the above note matters more for a getAllPagePost_KIData or similar method that formats everything for me. 
     }
