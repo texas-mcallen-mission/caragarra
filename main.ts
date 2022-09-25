@@ -275,7 +275,7 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
         message: "",
         created_time: "",
         is_popular: false,
-        post_id:"",
+        post_id: "",
     };
     outData.likes = post_data.likes.summary.total_count;
     outData.comments = post_data.comments.summary.total_count;
@@ -313,6 +313,7 @@ function test2() {
             is_popular: 7,
             created_time: 8,
             compat_time: 9,
+            log_time: 10,
         },
     }
 
@@ -330,6 +331,7 @@ function test2() {
         let additionalData = {
             page_id: page.page_id,
             page_name: page.getPageName(),
+            log_time: new Date(),
         };
         kiData.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
         
@@ -362,6 +364,7 @@ function testerThingy() {
             is_popular: 7,
             created_time: 8,
             compat_time: 9,
+            log_time: 10,
         },
         includeSoftcodedColumns: true,
     };
@@ -393,6 +396,7 @@ function testerThingy() {
         let additionalData = {
             page_id: page.page_id,
             page_name: page.getPageName(),
+            log_time: new Date(),
         }
         fbStatsClass.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
 
