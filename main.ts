@@ -274,7 +274,8 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
         shares: 0,
         message: "",
         created_time: "",
-        is_popular:false
+        is_popular: false,
+        post_id:"",
     };
     outData.likes = post_data.likes.summary.total_count;
     outData.comments = post_data.comments.summary.total_count;
@@ -289,6 +290,7 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
     outData.message = post_data.message;
     outData.created_time = post_data.created_time
     outData.is_popular = post_data.is_popular
+    outData.post_id = post_data.id
 
     return outData
 }
@@ -303,14 +305,15 @@ function test2() {
         initialColumnOrder: {
             page_id: 0,
             page_name: 1,
-            message: 2,
-            likes: 3,
-            comments: 4,
-            shares: 5,
-            is_popular: 6,
-            created_time: 7,
-            compat_time: 8,
-        }
+            post_id: 2,
+            message: 3,
+            likes: 4,
+            comments: 5,
+            shares: 6,
+            is_popular: 7,
+            created_time: 8,
+            compat_time: 9,
+        },
     }
 
     let testSheet2 = new SheetData(new RawSheetData(testDataConfig2))
@@ -351,13 +354,14 @@ function testerThingy() {
         initialColumnOrder: {
             page_id: 0,
             page_name: 1,
-            message: 2,
-            likes: 3,
-            comments: 4,
-            shares: 5,
-            is_popular: 6,
-            created_time: 7,
-            compat_time: 8,
+            post_id:2,
+            message: 3,
+            likes: 4,
+            comments: 5,
+            shares: 6,
+            is_popular: 7,
+            created_time: 8,
+            compat_time: 9,
         },
         includeSoftcodedColumns: true,
     };
