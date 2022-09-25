@@ -1,3 +1,22 @@
+function getThisWeeksPageData() {
+    // let kiStartDate = new Date("September 20 2022")
+    // let kiEndDate = new Date("September 25 2022")
+
+    let weekConfig: sheetDataEntry = {
+        tabName: "WeeklyData",
+        headerRow: 0,
+        includeSoftcodedColumns: true,
+        initialColumnOrder: fbConfigOptions.lcs_data_column_config
+    }
+
+    let weekData:SheetData = new SheetData(new RawSheetData(weekConfig))
+
+    // WYLO: trying to figure out how to get this week's data out programatically.
+    // Also not sure exactly how to do this chunk; can't I just filter this in the big stream?
+    // I think this should be more for a higher time granularity view
+
+}
+
 
 function test2() {
     let startDate = new Date();
