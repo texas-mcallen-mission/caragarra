@@ -328,7 +328,7 @@ function test2() {
         };
         kiData.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
         
-        testSheet2.setData(allPagePostStats)
+        testSheet2.setData(kiData.end)
         // WYLO: need to figure out how to handle bulk requests to knock down FB I/O time.
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
         // Ideally I'd be able to use the time stuff to both get individual page data objects as well as the stats stuff with the same args.
