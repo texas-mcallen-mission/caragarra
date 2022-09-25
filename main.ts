@@ -321,6 +321,13 @@ function test2() {
     
     for (let page of managedPages) {
         let allPagePostStats = page.getAllPagePostData()
+        let kiData = new kiDataClass(allPagePostStats)
+        let additionalData = {
+            page_id: page.page_id,
+            page_name: page.getPageName(),
+        };
+        kiData.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
+        
         testSheet2.setData(allPagePostStats)
         // WYLO: need to figure out how to handle bulk requests to knock down FB I/O time.
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
