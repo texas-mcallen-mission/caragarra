@@ -179,20 +179,27 @@ class fbPage {
 
         }
     }
-    getAllPagePostData() {
+    getAllPagePostData():parsed_post_data[] {
         let request = this.page_id + "/posts?fields=created_time,message,likes.summary(true),comments.summary(true),shares.summary(true),insights"
         let data = fbFetcher_(request, this.access_token)
-        let outData: post_struct_extra_stats[] = []
+        let fbPostData: post_struct_extra_stats[] = []
+        let outData : parsed_post_data[] = []
         if (data.hasOwnProperty("data")) {
-            outData = data["data"]
+            fbPostData = data["data"]
+        }
+        for (let postData of fbPostData) {
+            outData.push(parsePostStats(postData))
         }
         console.log(outData)
-        // I *THINK* data here should be of type post_struct_extra_stats[]
-        console.log(Object.getOwnPropertyNames(outData[0]))
+        // console.log(fbPostData)
+        // // I *THINK* data here should be of type post_struct_extra_stats[]
+        // console.log(Object.getOwnPropertyNames(fbPostData[0]))
 
         // WYLO: making sure everything is in the post_struct_extra_stats format.
-    // basically there's a way to get multiple thingies at once at a wayyyyy cheaper I/O cost.  I'll have to figure this out eventually, first I need to figure out what all I need from it one-by-one
-    // the above note matters more for a getAllPagePost_KIData or similar method that formats everything for me. 
+        // basically there's a way to get multiple thingies at once at a wayyyyy cheaper I/O cost.  I'll have to figure this out eventually, first I need to figure out what all I need from it one-by-one
+        // the above note matters more for a getAllPagePost_KIData or similar method that formats everything for me.
+
+        return outData
     }
     getAllPostObjs():post[] {
         let inData:post_struct[] = this.getAllPostList()
@@ -314,6 +321,7 @@ function test2() {
     
     for (let page of managedPages) {
         let allPagePostStats = page.getAllPagePostData()
+        testSheet2.setData(allPagePostStats)
         // WYLO: need to figure out how to handle bulk requests to knock down FB I/O time.
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
         // Ideally I'd be able to use the time stuff to both get individual page data objects as well as the stats stuff with the same args.
@@ -370,6 +378,7 @@ function testerThingy() {
 
         let addedData = fbStatsClass.end
         lcsData.push(...addedData)
+
         /* WYLO: Getting ready for integrating everything.
             Need to figure out the batching options so that I can get multiple posts's data from the same page at once
             - now that there's a standardized output, it shouldn't be that hard to do properly
