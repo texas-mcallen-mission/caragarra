@@ -321,7 +321,7 @@ function test2() {
 
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null)
     
-    let kiData: kiDataEntry[] = []
+    let allKiData: kiDataEntry[] = []
     
     let managedPages: fbPage[] = self.getManagedPageObjs()
     
@@ -334,12 +334,13 @@ function test2() {
             log_time: new Date(),
         };
         kiData.bulkAppendObject(additionalData).addGranulatedTime("created_time", "compat_time", timeGranularities.minute)
-        
-        testSheet2.setData(kiData.end)
+        allKiData.push(...kiData.end)
         // WYLO: need to figure out how to handle bulk requests to knock down FB I/O time.
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
         // Ideally I'd be able to use the time stuff to both get individual page data objects as well as the stats stuff with the same args.
     }
+    // testSheet2.setData(allKiData)
+    testSheet2.insertData(allKiData)
     let endDate = new Date()
     let endMillis = endDate.getUTCMilliseconds()
     let duration = Math.floor((endMillis - startMillis) / 1000)
