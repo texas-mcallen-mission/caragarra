@@ -370,7 +370,7 @@ function testerThingy() {
     };
     
     // let testSheetRaw = 
-        let testSheet = new SheetData(new RawSheetData(testDataConfig);)
+        let testSheet = new SheetData(new RawSheetData(testDataConfig))
     
     // now onto the FB-specific stuff.
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
