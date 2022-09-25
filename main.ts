@@ -294,6 +294,8 @@ function parsePostStats(post_data: post_struct_extra_stats):parsed_post_data {
 }
 
 function test2() {
+    let startDate = new Date()
+    let startMillis = startDate.getUTCMilliseconds()
     let testDataConfig2: sheetDataEntry = {
         tabName: "fbDataBulkDemo",
         headerRow: 0,
@@ -333,8 +335,15 @@ function test2() {
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
         // Ideally I'd be able to use the time stuff to both get individual page data objects as well as the stats stuff with the same args.
     }
+    let endDate = new Date()
+    let endMillis = endDate.getUTCMilliseconds()
+    let duration = Math.floor((endMillis - startMillis) / 1000)
+    console.log("Duration, seconds: ",duration)
+    
 }
 function testerThingy() {
+    let startDate = new Date();
+    let startMillis = startDate.getUTCMilliseconds()
     // setup for sheetdata classs
     let testDataConfig: sheetDataEntry = {
         tabName: "fbDataDemo",
@@ -396,7 +405,12 @@ function testerThingy() {
     }
 
     testSheet.setData(lcsData)
+    
     console.log("completed.")
+    let endDate = new Date();
+    let endMillis = endDate.getUTCMilliseconds();
+    let duration = Math.floor((endMillis - startMillis) / 1000);
+    console.log("Duration, seconds: ", duration)
 
 }
 
