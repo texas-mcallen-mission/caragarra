@@ -37,6 +37,40 @@ const fbConfigOptions = {
         
     }
 }
+interface timeControlData {
+    time_since?: Date | string,
+    time_until?: Date | string,
+    [index:string]:any
+}
+function getTimeControlString_(timeData: timeControlData): string {
+    let testTimeControl: timeControlData = {
+        testing: "wpp",
+        time_since:"chickenNuggies"
+    }
+    let outData: string = ""
+    
+    let hasStart = false
+
+    if (timeData.hasOwnProperty("time_since")) {
+        var sinceString = convertDateToFBCompatString_(timeData.time_since)
+        hasStart = true
+        outData += "since=" + sinceString
+    }
+
+    if (timeData.hasOwnProperty("time_until")) {
+        var untilString: string = convertDateToFBCompatString_(timeData.time_until)
+        if (hasStart == true) {
+            outData += "&"
+        }
+
+        outData += "until=" + untilString
+
+    }
+
+
+
+    return outData
+}
 
 function convertDateToFBCompatString_(date) {
     let inDate = new Date(date);
@@ -44,11 +78,11 @@ function convertDateToFBCompatString_(date) {
     return outString;
 }
 
-interface postArgs {
-    startDate?: Date,
-    endDate?: Date,
-    limit?: number,
-}
+// interface postArgs {
+//     startDate?: Date,
+//     endDate?: Date,
+//     limit?: number,
+// }
 
 function mergeCustomizer_(objValue, srcValue) {
     if (_.isArray(objValue)) {
@@ -81,7 +115,7 @@ function testMergeCustomizer() {
 
 }
 
-function fbFetcher_(request: string, access_token: string, includePages: boolean = false): {} {
+function fbFetcher_(request: string, access_token: string, includePages: boolean = true): {} {
     let appendCharacter = "?";
     if (request.includes("?")) {
         appendCharacter = "&";
@@ -93,11 +127,12 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
         url += fbConfigOptions.baseURL;
     }
     url += request;
-    if (!request.includes("access_token=")) {
+    // then check to see if request aready has an access token attached to it
+    if (!request.includes(fbConfigOptions.access_token_tag)) {
         url += appendCharacter + fbConfigOptions.access_token_tag + access_token;
     }
     // let url: string = fbConfigOptions.baseURL + request + appendCharacter + fbConfigOptions.access_token_tag + access_token;
-    var response = UrlFetchApp.fetch(url, fbConstants.fetchArgs);
+    var response = UrlFetchApp.fetch(url,fbConfigOptions.fetch_args);
     let responseData: {} = JSON.parse(response.getContentText());
     // makes sure conditions are right to run this thing.  responseData["data"] check is for sanity and for making the TS linter happy
     if (includePages && responseData.hasOwnProperty("paging") && responseData.hasOwnProperty("data")) {
@@ -117,6 +152,10 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     return responseData;
 }
 
+interface fetchArgs {
+    
+}
+
 class user {
     access_token: string;
     user_id: string;
@@ -130,11 +169,12 @@ class user {
             let request = "me?fields=id";
             let response = fbFetcher_(request, access_token);
             if (response.hasOwnProperty("id")) {
-                let response = fbFetcher_(request, access_token);
+                // let response = fbFetcher_(request, access_token);
                 this.user_id = response["id"];
             }
         }
     }
+
     getManagedPageData(): pageManagementData_struct[] {
         let request = "me/accounts?type=page";
         //@ts-ignore function is too generalized atm to do this, but it's useful still...
@@ -153,8 +193,6 @@ class user {
             pages.push(entry);
         }
         return pages;
-
-
     }
 
     getManagedPageObjs(): fbPage[] {
