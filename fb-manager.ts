@@ -89,12 +89,17 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     let url: string = fbConfigOptions.baseURL + request + appendCharacter + fbConfigOptions.access_token_tag + access_token;
     var response = UrlFetchApp.fetch(url, fbConstants.fetchArgs);
     let responseData: {} = JSON.parse(response.getContentText());
-
-    if (includePages && responseData.hasOwnProperty("next")) {
+    // makes sure conditions are right to run this thing.  responseData["data"] check is for sanity and for making the TS linter happy
+    if (includePages && responseData.hasOwnProperty("paging") && responseData.hasOwnProperty("data")) {
+        let outData = responseData["data"]
         console.warn("Fetching multiple pages for request!")
-        let recurseData = fbFetcher_(responseData["next"], access_token, true);
-        let intermediateOutput = _.mergeWith(responseData, recurseData, mergeCustomizer_);
-        return intermediateOutput;
+        let recurseData = fbFetcher_(responseData["paging"]["next"], access_token, true);
+        if (recurseData.hasOwnProperty("data")) {
+            outData.push(...recurseData["data"])
+        }
+        responseData["data"] = outData
+        // let intermediateOutput = _.mergeWith(responseData, recurseData, mergeCustomizer_);
+        // return intermediateOutput;
     }
 
     return responseData;
