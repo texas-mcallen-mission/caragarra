@@ -91,6 +91,7 @@ function fbFetcher_(request: string, access_token: string, includePages: boolean
     let responseData: {} = JSON.parse(response.getContentText());
 
     if (includePages && responseData.hasOwnProperty("next")) {
+        console.warn("Fetching multiple pages for request!")
         let recurseData = fbFetcher_(responseData["next"], access_token, true);
         let intermediateOutput = _.mergeWith(responseData, recurseData, mergeCustomizer_);
         return intermediateOutput;
@@ -175,6 +176,30 @@ class fbPage {
         }
 
 
+    }
+
+    getAllPostObjsPaginated(): post[] {
+        let inData: post_struct[] = this.getAllPostPaginatedTest();
+        let posts: post[] = [];
+        for (let postEntry of inData) {
+            let postObj = new post(postEntry.id, this.access_token);
+            posts.push(postObj);
+        }
+
+        return posts;
+    }
+
+    getAllPostPaginatedTest(): post_struct[] {
+        let request = this.page_id + "/posts?limit=4"
+        let response = fbFetcher_(request, this.access_token,true)
+
+        if (response.hasOwnProperty("data")) {
+            console.log(response["data"].length)
+            return response["data"];
+        } else {
+            return []
+
+        }
     }
 
     getPostsList(args: {} | null | undefined) {

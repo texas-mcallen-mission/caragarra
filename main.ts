@@ -80,7 +80,8 @@ function testerThingy() {
 
     let managedPages: fbPage[] = self.getManagedPageObjs();
     for (let page of managedPages) {
-        let pagePosts: post[] = page.getAllPostObjs();
+        // let pagePosts: post[] = page.getAllPostObjs();
+        let pagePosts: post[] = page.getAllPostObjsPaginated()
         let page_post_ki_data: parsed_post_data[] = [];
         for (let pagePost of pagePosts) {
             let postData = pagePost.getPostStats();
