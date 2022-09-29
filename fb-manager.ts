@@ -67,7 +67,7 @@ function getTimeControlString_(timeData: timeControlData): string {
 
 function convertDateToFBCompatString_(date) {
     let inDate = new Date(date);
-    let outString = inDate.getDay() + " " + fbConfigOptions.monthConverter.short[inDate.getMonth()] + " " + inDate.getFullYear();
+    let outString = inDate.getDate() + " " + fbConfigOptions.monthConverter.short[inDate.getMonth()] + " " + inDate.getFullYear();
     return outString;
 }
 
