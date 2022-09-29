@@ -37,18 +37,12 @@ const fbConfigOptions = {
         
     }
 }
-interface timeControlData {
+interface timeControlData extends extra_args {
     time_since?: Date | string,
     time_until?: Date | string,
-    [index:string]:any
 }
 function getTimeControlString_(timeData: timeControlData): string {
-    let testTimeControl: timeControlData = {
-        testing: "wpp",
-        time_since:"chickenNuggies"
-    }
-    let outData: string = ""
-    
+    let outData: string = ""    
     let hasStart = false
 
     if (timeData.hasOwnProperty("time_since")) {
@@ -56,7 +50,6 @@ function getTimeControlString_(timeData: timeControlData): string {
         hasStart = true
         outData += "since=" + sinceString
     }
-
     if (timeData.hasOwnProperty("time_until")) {
         var untilString: string = convertDateToFBCompatString_(timeData.time_until)
         if (hasStart == true) {
@@ -167,7 +160,7 @@ class user {
         } else {
             // makes it to where we treat things the same for me's as other people.  May not be a good idea?
             let request = "me?fields=id";
-            let response = fbFetcher_(request, access_token);
+            let response = fbFetcher_(request, access_token,false);
             if (response.hasOwnProperty("id")) {
                 // let response = fbFetcher_(request, access_token);
                 this.user_id = response["id"];
@@ -175,13 +168,23 @@ class user {
         }
     }
 
-    getManagedPageData(): pageManagementData_struct[] {
+    getManagedPageData(extra_args: extra_args = {}): pageManagementData_struct[] {
         let request = "me/accounts?type=page";
         //@ts-ignore function is too generalized atm to do this, but it's useful still...
         let response = fbFetcher_(request, this.access_token);
         if (!response.hasOwnProperty("data")) {
             return [];
         }
+        // arg-stacking boilerplate...
+        if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
+            request += getTimeControlString_(extra_args)
+        }
+        let include_pages = true;
+        if (extra_args.hasOwnProperty("include_pages")) {
+            // @ts-ignore this is literally checking to see if it'll work or not RIGHT THERE
+            include_pages = extra_args.include_pages;
+        }
+
         let responseData: pageManagementData_struct[] = response["data"];
         let pages: pageManagementData_struct[] = [];
 
@@ -189,16 +192,19 @@ class user {
         for (let entry of responseData) {
             let request = entry.id + "?fields=access_token";
             // entry.used_token = entry.access_token;
-            entry.page_access_token = fbFetcher_(request, this.access_token)["access_token"];
+
+            let test = {}
+
+            entry.page_access_token = fbFetcher_(request, this.access_token,include_pages)["access_token"];
             pages.push(entry);
         }
         return pages;
     }
 
-    getManagedPageObjs(): fbPage[] {
+    getManagedPageObjs(extra_args: extra_args = {}): fbPage[] {
         let pages: fbPage[] = [];
 
-        let managedPages: pageManagementData_struct[] = this.getManagedPageData();
+        let managedPages: pageManagementData_struct[] = this.getManagedPageData(extra_args);
 
         for (let pageInfo of managedPages) {
             let pageObj = new fbPage(pageInfo.page_access_token, pageInfo.id, this.config);
@@ -220,9 +226,18 @@ class fbPage {
         this.config = fbConfigOptions;
     }
 
-    getAllPostList(): post_struct[] {
+    getAllPostList(extra_args: extra_args = {}): post_struct[] {
         let request = this.page_id + "/posts";
-        let response = fbFetcher_(request, this.access_token);
+        // arg-stacking boilerplate...
+        if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
+            request += getTimeControlString_(extra_args);
+        }
+        let include_pages = true;
+        if (extra_args.hasOwnProperty("include_pages")) {
+            // @ts-ignore this is literally checking to see if it'll work or not RIGHT THERE
+            include_pages = extra_args.include_pages;
+        }
+        let response = fbFetcher_(request, this.access_token,include_pages);
 
         if (response.hasOwnProperty("data")) {
             return response["data"];
@@ -233,47 +248,57 @@ class fbPage {
 
     }
 
-    getAllPostObjsPaginated(): post[] {
-        let inData: post_struct[] = this.getAllPostPaginatedTest();
-        let posts: post[] = [];
-        for (let postEntry of inData) {
-            let postObj = new post(postEntry.id, this.access_token);
-            posts.push(postObj);
-        }
+    // getAllPostObjsPaginated(): post[] {
+    //     let inData: post_struct[] = this.getAllPostPaginatedTest();
+    //     let posts: post[] = [];
+    //     for (let postEntry of inData) {
+    //         let postObj = new post(postEntry.id, this.access_token);
+    //         posts.push(postObj);
+    //     }
 
-        return posts;
-    }
+    //     return posts;
+    // }
 
-    getAllPostPaginatedTest(): post_struct[] {
-        let request = this.page_id + "/posts?limit=4"
-        let response = fbFetcher_(request, this.access_token,true)
+    // getAllPostPaginatedTest(): post_struct[] {
+    //     let request = this.page_id + "/posts?limit=4"
+    //     let response = fbFetcher_(request, this.access_token,true)
 
-        if (response.hasOwnProperty("data")) {
-            console.log(response["data"].length)
-            return response["data"];
-        } else {
-            return []
+    //     if (response.hasOwnProperty("data")) {
+    //         console.log(response["data"].length)
+    //         return response["data"];
+    //     } else {
+    //         return []
 
-        }
-    }
+    //     }
+    // }
 
-    getPostsList(args: {} | null | undefined) {
-        let baseRequest = this.page_id + "/posts";
-        if (args && args !== undefined) {
-            let hasStart = false;
-            let usesDate = false;
-            if (args.hasOwnProperty("startDate")) {
-                let compatDate = convertDateToFBCompatString_(args["startDate"]);
-                baseRequest += "?";
-                baseRequest += "since=" + compatDate;
-            }
-            // WYLO: finishing this bad boi up- need to add a the second date thingy, and whatever else the fb docs say I should be able to handle.
+    // getPostsList(args: {} | null | undefined) {
+    //     let baseRequest = this.page_id + "/posts";
+    //     if (args && args !== undefined) {
+    //         let hasStart = false;
+    //         let usesDate = false;
+    //         if (args.hasOwnProperty("startDate")) {
+    //             let compatDate = convertDateToFBCompatString_(args["startDate"]);
+    //             baseRequest += "?";
+    //             baseRequest += "since=" + compatDate;
+    //         }
+    //         // WYLO: finishing this bad boi up- need to add a the second date thingy, and whatever else the fb docs say I should be able to handle.
 
-        }
-    }
-    getAllPagePostData():parsed_post_data[] {
+    //     }
+    // }
+    getAllPagePostData(extra_args: extra_args = {}):parsed_post_data[] {
         let request = this.page_id + "/posts?fields=created_time,message,likes.summary(true),comments.summary(true),shares.summary(true),insights"
+        // arg-stacking boilerplate...
+        if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
+            request += getTimeControlString_(extra_args);
+        }
+        let include_pages = true;
+        if (extra_args.hasOwnProperty("include_pages")) {
+            // blocker @ts-ignore this is literally checking to see if it'll work or not RIGHT THERE
+            include_pages = extra_args.include_pages ?? true
+        }
         let data = fbFetcher_(request, this.access_token)
+
         let fbPostData: post_struct_extra_stats[] = []
         let outData : parsed_post_data[] = []
         if (data.hasOwnProperty("data")) {
@@ -293,8 +318,8 @@ class fbPage {
 
         return outData
     }
-    getAllPostObjs():post[] {
-        let inData:post_struct[] = this.getAllPostList()
+    getAllPostObjs(extra_args: extra_args = {}):post[] {
+        let inData:post_struct[] = this.getAllPostList(extra_args)
         let posts:post[] = []
         for (let postEntry of inData) {
             let postObj = new post(postEntry.id, this.access_token)
@@ -328,6 +353,7 @@ class post {
 
     getPostStats():post_struct_extra_stats|null {
         let request = this.post_id + "?fields=likes.summary(true),comments.summary(true),shares.summary(true),is_popular,created_time,message"
+        
         // WYLO: Trying to figure out how to get this thingy to work right; I don't have as many docs as I'd like for this part... :(
         let inData: post_struct_extra_stats | {} = fbFetcher_(request, this.access_token)
         // console.log(inData)

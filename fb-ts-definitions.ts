@@ -1,6 +1,13 @@
 /* INTERNAL DEFINITIONS */
 
 
+interface extra_args {
+    time_since?: Date | string,
+    time_until?: Date | string,
+    // maximum_entries?: boolean,
+    include_pages?: boolean,
+
+}
 
 interface parsed_post_data {
     likes: number,

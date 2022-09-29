@@ -33,7 +33,7 @@ function test2() {
     let self = new user(GITHUB_SECRET_DATA.access_token, fbConfigOptions, null);
 
     let allKiData: kiDataEntry[] = [];
-
+    // TODO add args
     let managedPages: fbPage[] = self.getManagedPageObjs();
 
     for (let page of managedPages) {
@@ -76,11 +76,11 @@ function testerThingy() {
     // let managedPages = self.getManagedPageData()
     let lcsData: kiDataEntry[] = [];
 
-
+    // TODO add Arg passthrough
     let managedPages: fbPage[] = self.getManagedPageObjs();
     for (let page of managedPages) {
         // let pagePosts: post[] = page.getAllPostObjs();
-        let pagePosts: post[] = page.getAllPostObjsPaginated()
+        let pagePosts: post[] = page.getAllPostObjs()
         let page_post_ki_data: parsed_post_data[] = [];
         for (let pagePost of pagePosts) {
             let postData = pagePost.getPostStats();
