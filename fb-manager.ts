@@ -177,7 +177,7 @@ class user {
         }
         // arg-stacking boilerplate...
         if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
-            request += getTimeControlString_(extra_args)
+            request += "&" + getTimeControlString_(extra_args)
         }
         let include_pages = true;
         if (extra_args.hasOwnProperty("include_pages")) {
@@ -230,7 +230,7 @@ class fbPage {
         let request = this.page_id + "/posts";
         // arg-stacking boilerplate...
         if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
-            request += getTimeControlString_(extra_args);
+            request += "&" + getTimeControlString_(extra_args);
         }
         let include_pages = true;
         if (extra_args.hasOwnProperty("include_pages")) {
@@ -290,7 +290,7 @@ class fbPage {
         let request = this.page_id + "/posts?fields=created_time,message,likes.summary(true),comments.summary(true),shares.summary(true),insights"
         // arg-stacking boilerplate...
         if (extra_args.hasOwnProperty("time_since") || extra_args.hasOwnProperty("time_until")) {
-            request += getTimeControlString_(extra_args);
+            request += "&" + getTimeControlString_(extra_args);
         }
         let include_pages = true;
         if (extra_args.hasOwnProperty("include_pages")) {

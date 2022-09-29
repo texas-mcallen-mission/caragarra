@@ -34,10 +34,16 @@ function test2() {
 
     let allKiData: kiDataEntry[] = [];
     // TODO add args
+    let test_args: extra_args = {
+        time_since: "2022-09-27",
+        time_until: "2022-09-29"
+    }
+    console.log(getTimeControlString_(test_args))
+
     let managedPages: fbPage[] = self.getManagedPageObjs();
 
     for (let page of managedPages) {
-        let allPagePostStats = page.getAllPagePostData();
+        let allPagePostStats = page.getAllPagePostData(test_args);
         let kiData = new kiDataClass(allPagePostStats);
         let additionalData = {
             page_id: page.page_id,
