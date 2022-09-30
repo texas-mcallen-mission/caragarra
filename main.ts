@@ -35,8 +35,8 @@ function test2() {
     let allKiData: kiDataEntry[] = [];
     // TODO add args
     let test_args: extra_args = {
-        time_since: "2022-09-27",
-        time_until: "2022-09-29"
+        // time_since: "2022-09-27",
+        // time_until: "2022-09-29"
     }
     console.log(getTimeControlString_(test_args))
 
@@ -55,6 +55,10 @@ function test2() {
         // Also need to figure out how to do the since= & until= stuff so that things work properly.
         // Ideally I'd be able to use the time stuff to both get individual page data objects as well as the stats stuff with the same args.
     }
+
+    let kiDataObj = new kiDataClass(allKiData)
+    let groupingKeys: string[] = ["page_name","post_id"]
+    console.log(JSON.stringify(kiDataObj.groupDataByMultipleKeys(groupingKeys)))
     // testSheet2.setData(allKiData)
     testSheet2.insertData(allKiData);
     let endDate = new Date();

@@ -71,11 +71,6 @@ function convertDateToFBCompatString_(date) {
     return outString;
 }
 
-// interface postArgs {
-//     startDate?: Date,
-//     endDate?: Date,
-//     limit?: number,
-// }
 
 function mergeCustomizer_(objValue, srcValue) {
     if (_.isArray(objValue)) {
